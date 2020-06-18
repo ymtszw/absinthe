@@ -97,6 +97,13 @@ defmodule Mix.Tasks.Absinthe.Schema.SdlTest do
         arg(:a4, :my_input_object)
       end
     end
+
+    subscription do
+      field :my_sub, :my_object do
+        arg(:a5, :id)
+        arg(:a6, :my_input_object)
+      end
+    end
   end
 
   @test_many_field_schema "Mix.Tasks.Absinthe.Schema.SdlTest.TestSchemaWithManyFields"
@@ -167,6 +174,7 @@ defmodule Mix.Tasks.Absinthe.Schema.SdlTest do
 
       assert schema =~ "myQuery(a1: ID, a2: MyInputObject): MyObject"
       assert schema =~ "myMutation(a3: ID, a4: MyInputObject): MyObject"
+      assert schema =~ "mySub(a5: ID, a6: MyInputObject): MyObject"
     end
   end
 end
