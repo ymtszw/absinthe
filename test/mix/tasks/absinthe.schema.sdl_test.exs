@@ -71,6 +71,36 @@ defmodule Mix.Tasks.Absinthe.Schema.SdlTest do
 
   @test_mod_schema "Mix.Tasks.Absinthe.Schema.SdlTest.TestSchemaWithMods"
 
+  defmodule TestSchemaWithManyFields do
+    use Absinthe.Schema
+
+    object :my_object do
+      field(:f1, :id)
+      field(:f2, :string)
+    end
+
+    input_object :my_input_object do
+      field(:f3, :boolean)
+      field(:f4, :integer)
+    end
+
+    query do
+      field :my_query, :my_object do
+        arg(:a1, :id)
+        arg(:a2, :my_input_object)
+      end
+    end
+
+    mutation do
+      field :my_mutation, :my_object do
+        arg(:a3, :id)
+        arg(:a4, :my_input_object)
+      end
+    end
+  end
+
+  @test_many_field_schema "Mix.Tasks.Absinthe.Schema.SdlTest.TestSchemaWithManyFields"
+
   describe "absinthe.schema.sdl" do
     test "parses options" do
       argv = ["output.graphql", "--schema", @test_schema]
@@ -111,6 +141,32 @@ defmodule Mix.Tasks.Absinthe.Schema.SdlTest do
 
       assert schema =~ "type Mod {"
       assert schema =~ "modField: String"
+    end
+
+    test "Generate schema while preserving order of fields and args" do
+      argv = ["--schema", @test_many_field_schema]
+      opts = Task.parse_options(argv)
+
+      {:ok, schema} = Task.generate_schema(opts)
+
+      assert schema =~
+               """
+               type MyObject {
+                 f1: ID
+                 f2: String
+               }
+               """
+
+      assert schema =~
+               """
+               input MyInputObject {
+                 f3: Boolean
+                 f4: Int
+               }
+               """
+
+      assert schema =~ "myQuery(a1: ID, a2: MyInputObject): MyObject"
+      assert schema =~ "myMutation(a3: ID, a4: MyInputObject): MyObject"
     end
   end
 end
