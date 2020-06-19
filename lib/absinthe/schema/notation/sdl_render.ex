@@ -258,6 +258,9 @@ defmodule Absinthe.Schema.Notation.SDL.Render do
   defp arguments(args, type_definitions) do
     any_descriptions? = Enum.any?(args, & &1.description)
 
+    # Reverse here in order to restore original definition order.
+    args_reversed = Enum.reverse(args)
+
     group(
       glue(
         nest(
@@ -265,7 +268,7 @@ defmodule Absinthe.Schema.Notation.SDL.Render do
             glue(
               "(",
               "",
-              render_list(args, type_definitions, ", ")
+              render_list(args_reversed, type_definitions, ", ")
             ),
             any_descriptions?
           ),
